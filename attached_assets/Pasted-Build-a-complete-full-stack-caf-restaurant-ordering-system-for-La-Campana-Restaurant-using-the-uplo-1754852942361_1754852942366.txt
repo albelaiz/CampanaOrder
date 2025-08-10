@@ -1,0 +1,117 @@
+Build a complete full-stack café/restaurant ordering system for La Campana Restaurant using the uploaded official logo.jpg (do not create a new logo). The system must match the restaurant’s black-and-gold branding and implement the following architecture, features, and design requirements:
+
+🏗️ Website Overview & Architecture
+Frontend: React with TypeScript, TailwindCSS, Radix UI components
+Backend: Node.js with Express server
+Database: PostgreSQL with Drizzle ORM
+Real-time: WebSocket connections for live updates
+Authentication: Passport.js for staff/admin login
+
+🎯 Core System Features
+1. Customer Experience (No Registration Required)
+
+QR Code Ordering: Customers scan table QR codes to access the menu
+
+Digital Menu: Browse items by categories (Coffee, Food, Desserts)
+
+Shopping Cart: Add/remove items with quantities
+
+Direct Ordering: Place orders without waiting for servers
+
+Real-time Status: Track order progress (Pending → Preparing → Ready)
+
+2. Staff Dashboard (/staff)
+
+Order Management: View all active orders in real-time
+
+Status Updates: Move orders through preparation stages
+
+Kitchen View: See pending, preparing, and ready orders
+
+Live Stats: Monitor order counts and workflow
+
+3. Admin Panel (/admin)
+
+Menu Management: Add, edit, delete, activate/deactivate items
+
+Table Management: Create tables with QR codes
+
+Analytics: Revenue tracking, order statistics
+
+Data Export: Excel reports for business analysis
+
+Staff Management: User account control
+
+🔄 How the System Works
+Customer Journey:
+Scan QR Code → Table number detected → Browse Menu → Add to Cart → Place Order → Track Status in real-time → Pickup Ready Order → Notification when complete
+
+Staff Workflow:
+Real-time New Order Notification → Update to "Preparing" → Mark as "Ready" → Complete Order
+
+Admin Operations:
+Live menu updates, analytics, QR code table setup, data exports.
+
+🎨 Design & Branding Requirements
+Brand Colors:
+
+Primary: Black background (#000000)
+
+Accent: Golden Yellow (#FFD700) matching uploaded logo
+
+Fonts: Montserrat or Poppins (bold, modern)
+
+Logo Usage:
+
+Use uploaded logo.jpg in the navbar and hero section
+
+Do not generate a new logo
+
+UI Elements:
+
+Navbar: Black background, gold text, hover underline in gold, logo on left
+
+Buttons: Gold background, black text, rounded corners, hover invert colors
+
+Menu Cards: Black background, gold border, white price text, gold titles
+
+Status Colors: Yellow (pending), Blue (preparing), Green (ready)
+
+Animations: Smooth fade-in (Framer Motion)
+
+Layout:
+
+Navigation Bar with logo and menu links
+
+Hero Section with large logo and “View Menu” CTA
+
+Menu Grid with “Add to Cart” functionality
+
+Cart Section with checkout button
+
+Footer with gold text:
+
+Phone: +212616316245
+
+Address: قرب شارع الحسن الثاني أمام الكليات، مرتيل 93150
+
+🔧 Technical Implementation
+Database Schema: Menu Items, Orders, Order Items, Tables, Users
+Real-time: WebSocket for instant updates
+Security: Role-based access (Customer, Staff, Admin), Zod validation, SQL injection protection
+
+📱 Multi-Platform Support
+Mobile-first for customers
+
+Tablet-friendly staff dashboard
+
+Progressive Web App features for offline caching
+
+📊 Business Intelligence
+Revenue, best-seller analysis, peak hours
+
+Export to Excel
+
+Final Goal:
+Deliver a fully functional, production-ready La Campana Restaurant Ordering System with a luxury black-and-gold theme matching the uploaded logo, optimized for speed, scalability, and a premium customer experience.
+
