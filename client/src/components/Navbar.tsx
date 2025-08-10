@@ -15,10 +15,6 @@ export default function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleAuthAction = (role: 'staff' | 'admin') => {
-    window.location.href = "/api/login";
-  };
-
   return (
     <nav className="fixed top-0 w-full z-50 glass-morphism" data-testid="navbar">
       <div className="container mx-auto px-4 py-3">
@@ -59,25 +55,7 @@ export default function Navbar() {
               Contact
             </button>
             
-            {!isAuthenticated ? (
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => handleAuthAction('staff')}
-                  className="border-gold text-gold hover:bg-gold hover:text-navy"
-                  data-testid="button-staff-login"
-                >
-                  Staff Login
-                </Button>
-                <Button
-                  onClick={() => handleAuthAction('admin')}
-                  className="gold-gradient text-navy hover:opacity-90"
-                  data-testid="button-admin-login"
-                >
-                  Admin
-                </Button>
-              </div>
-            ) : (
+            {isAuthenticated && (
               <div className="flex items-center space-x-4">
                 <span className="text-warm-white">
                   Welcome, {user?.firstName || user?.email}
@@ -139,25 +117,7 @@ export default function Navbar() {
                 Contact
               </button>
               
-              {!isAuthenticated ? (
-                <div className="flex flex-col space-y-2 pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleAuthAction('staff')}
-                    className="border-gold text-gold hover:bg-gold hover:text-navy justify-start"
-                    data-testid="button-staff-login-mobile"
-                  >
-                    Staff Login
-                  </Button>
-                  <Button
-                    onClick={() => handleAuthAction('admin')}
-                    className="gold-gradient text-navy hover:opacity-90 justify-start"
-                    data-testid="button-admin-login-mobile"
-                  >
-                    Admin
-                  </Button>
-                </div>
-              ) : (
+              {isAuthenticated && (
                 <div className="flex flex-col space-y-2 pt-2">
                   {(user?.role === 'staff' || user?.role === 'admin') && (
                     <Button
