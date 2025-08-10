@@ -57,7 +57,7 @@ export default function Hero() {
             Experience Chef Hicham's exquisite seafood cuisine in our elegant Mediterranean atmosphere
           </p>
           
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+          <div className="flex justify-center">
             <Button
               onClick={scrollToMenu}
               className="gold-gradient text-navy px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity duration-300 flex items-center space-x-2"
@@ -65,15 +65,6 @@ export default function Hero() {
             >
               <i className="fas fa-utensils"></i>
               <span>View Our Menu</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={simulateQRScan}
-              className="border-2 border-gold text-gold px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gold hover:text-navy transition-colors duration-300 flex items-center space-x-2"
-              data-testid="button-scan-qr"
-            >
-              <i className="fas fa-qrcode"></i>
-              <span>Scan Table QR</span>
             </Button>
           </div>
           
