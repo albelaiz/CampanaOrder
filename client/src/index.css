@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* La Campana Brand Colors */
+  --navy: hsl(217, 100%, 9%);
+  --midnight: hsl(217, 39%, 14%);
+  --charcoal: hsl(240, 10%, 8%);
+  --gold: hsl(51, 100%, 50%);
+  --amber: hsl(45, 93%, 58%);
+  --warm-white: hsl(210, 40%, 98%);
+  
+  /* Base colors adapted for La Campana theme */
+  --background: var(--navy);
+  --foreground: var(--warm-white);
+  --card: var(--midnight);
+  --card-foreground: var(--warm-white);
+  --popover: var(--navy);
+  --popover-foreground: var(--warm-white);
+  --primary: var(--gold);
+  --primary-foreground: var(--navy);
+  --secondary: var(--midnight);
+  --secondary-foreground: var(--warm-white);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 16%, 65%);
+  --accent: var(--charcoal);
+  --accent-foreground: var(--gold);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: var(--warm-white);
+  --border: hsl(45, 93%, 58%);
+  --input: var(--midnight);
+  --ring: var(--gold);
+  
+  /* Typography */
+  --font-cinzel: 'Cinzel', serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-cinzel);
+  
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: var(--navy);
+  --foreground: var(--warm-white);
+  --card: var(--midnight);
+  --card-foreground: var(--warm-white);
+  --popover: var(--navy);
+  --popover-foreground: var(--warm-white);
+  --primary: var(--gold);
+  --primary-foreground: var(--navy);
+  --secondary: var(--midnight);
+  --secondary-foreground: var(--warm-white);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 16%, 65%);
+  --accent: var(--charcoal);
+  --accent-foreground: var(--gold);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: var(--warm-white);
+  --border: hsl(45, 93%, 58%);
+  --input: var(--midnight);
+  --ring: var(--gold);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+      linear-gradient(135deg, var(--navy) 0%, var(--midnight) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .maritime-bg {
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+      linear-gradient(135deg, var(--navy) 0%, var(--midnight) 100%);
+  }
+  
+  .glass-morphism {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+  }
+  
+  .premium-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .gold-gradient {
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+  }
+  
+  .cinzel {
+    font-family: var(--font-cinzel);
+  }
+  
+  .inter {
+    font-family: var(--font-inter);
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-pulse-gold {
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    opacity: 0.5; 
+  }
+  100% { 
+    opacity: 1; 
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); 
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--midnight);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amber);
+}
+
+/* Status indicator colors */
+.status-pending {
+  @apply bg-yellow-500 text-yellow-100;
+}
+
+.status-preparing {
+  @apply bg-blue-500 text-blue-100;
+}
+
+.status-ready {
+  @apply bg-green-500 text-green-100;
+}
+
+.status-served {
+  @apply bg-orange-500 text-orange-100;
+}
+
+.status-cancelled {
+  @apply bg-red-500 text-red-100;
+}
