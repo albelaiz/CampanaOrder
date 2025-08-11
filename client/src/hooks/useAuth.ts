@@ -1,14 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-
 export function useAuth() {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-  });
+  // Since we removed authentication, return a default user object
+  const mockUser = {
+    id: "demo-user",
+    email: "demo@lacampana.com",
+    firstName: "Demo",
+    lastName: "User",
+    role: "admin" // Give demo user admin privileges
+  };
 
   return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
+    user: mockUser,
+    isLoading: false,
+    isAuthenticated: true,
   };
 }

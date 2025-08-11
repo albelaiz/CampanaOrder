@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useAppContext } from "@/context/AppContext";
 import logoImage from "@assets/WhatsApp Image 2025-08-09 at 14.06.26_5064a253_1754854384884.jpg";
 
 export default function Navbar() {
   const { isAuthenticated, user } = useAuth();
+  const { currentTable } = useAppContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
@@ -54,12 +56,16 @@ export default function Navbar() {
             >
               Contact
             </button>
+
+            {currentTable && (
+              <div className="text-warm-white border-l border-gold border-opacity-30 pl-4">
+                <span className="text-sm">Table</span>
+                <div className="text-gold font-bold text-lg">{currentTable}</div>
+              </div>
+            )}
             
             {isAuthenticated && (
               <div className="flex items-center space-x-4">
-                <span className="text-warm-white">
-                  Welcome, {user?.firstName || user?.email}
-                </span>
                 {(user?.role === 'staff' || user?.role === 'admin') && (
                   <Button
                     variant="outline"
@@ -70,14 +76,6 @@ export default function Navbar() {
                     Dashboard
                   </Button>
                 )}
-                <Button
-                  variant="outline"
-                  onClick={() => window.location.href = "/api/logout"}
-                  className="border-gold text-gold hover:bg-gold hover:text-navy"
-                  data-testid="button-logout"
-                >
-                  Logout
-                </Button>
               </div>
             )}
           </div>
@@ -129,14 +127,6 @@ export default function Navbar() {
                       Dashboard
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    onClick={() => window.location.href = "/api/logout"}
-                    className="border-gold text-gold hover:bg-gold hover:text-navy justify-start"
-                    data-testid="button-logout-mobile"
-                  >
-                    Logout
-                  </Button>
                 </div>
               )}
             </div>

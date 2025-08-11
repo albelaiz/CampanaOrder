@@ -27,6 +27,14 @@ export default function Footer() {
     window.open('tel:+212616316245', '_self');
   };
 
+  const handleInstagramClick = () => {
+    window.open('https://www.instagram.com/restaurant.lacampana/?hl=fr', '_blank');
+  };
+
+  const handleWhatsAppClick = () => {
+    window.open('https://wa.me/212616316245', '_blank');
+  };
+
   return (
     <footer id="contact" className="bg-charcoal py-12" data-testid="footer">
       <div className="container mx-auto px-4">
@@ -126,10 +134,18 @@ export default function Footer() {
                 <button className="text-warm-white hover:text-gold transition-colors duration-300" data-testid="social-facebook">
                   <i className="fab fa-facebook-f text-xl"></i>
                 </button>
-                <button className="text-warm-white hover:text-gold transition-colors duration-300" data-testid="social-instagram">
+                <button
+                  data-testid="social-instagram"
+                  className="text-warm-white hover:text-gold transition-colors duration-300"
+                  onClick={handleInstagramClick}
+                >
                   <i className="fab fa-instagram text-xl"></i>
                 </button>
-                <button className="text-warm-white hover:text-gold transition-colors duration-300" data-testid="social-whatsapp">
+                <button 
+                  className="text-warm-white hover:text-gold transition-colors duration-300" 
+                  data-testid="social-whatsapp"
+                  onClick={handleWhatsAppClick}
+                >
                   <i className="fab fa-whatsapp text-xl"></i>
                 </button>
                 <button className="text-warm-white hover:text-gold transition-colors duration-300" data-testid="social-tripadvisor">

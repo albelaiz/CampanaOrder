@@ -152,8 +152,8 @@ export const orderItemRelations = relations(orderItems, ({ one }) => ({
 export const insertTableSchema = createInsertSchema(tables).omit({ id: true, createdAt: true });
 export const insertMenuCategorySchema = createInsertSchema(menuCategories).omit({ id: true });
 export const insertMenuItemSchema = createInsertSchema(menuItems).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
+export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, orderNumber: true, createdAt: true, updatedAt: true });
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true, orderId: true });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;

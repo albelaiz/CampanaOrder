@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import type { OrderWithItems } from "@shared/schema";
 
 const statusConfig = {
@@ -22,18 +21,6 @@ export default function StaffDashboard() {
 
   const { data: orders = [], isLoading } = useQuery<OrderWithItems[]>({
     queryKey: ["/api/staff/orders", selectedStatus === "all" ? "" : selectedStatus].filter(Boolean),
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    },
   });
 
   const updateStatusMutation = useMutation({
@@ -48,17 +35,6 @@ export default function StaffDashboard() {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: "Update Failed",
         description: "Failed to update order status. Please try again.",
@@ -88,10 +64,6 @@ export default function StaffDashboard() {
     updateStatusMutation.mutate({ orderId, status: newStatus });
   };
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-charcoal flex items-center justify-center">
@@ -113,14 +85,6 @@ export default function StaffDashboard() {
             </h1>
             <p className="text-xl text-warm-white">Kitchen Management & Order Processing</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-gold text-gold hover:bg-gold hover:text-navy"
-            data-testid="button-logout"
-          >
-            <i className="fas fa-sign-out-alt mr-2"></i>Logout
-          </Button>
         </div>
         
         {/* Live Stats */}

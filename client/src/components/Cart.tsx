@@ -81,7 +81,7 @@ export default function Cart() {
     }));
 
     const orderData = {
-      tableId: currentTable.toString(), // In production, this would be the actual table ID
+      tableNumber: currentTable, // Send table number to backend
       totalAmount: cartTotal.toString(),
       items: orderItems,
     };

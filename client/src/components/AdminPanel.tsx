@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import type { MenuItem, MenuCategory, Table, MenuItemWithCategory } from "@shared/schema";
 
 interface AdminPanelProps {}
@@ -26,45 +25,27 @@ export default function AdminPanel({}: AdminPanelProps) {
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
   const [isAddTableDialogOpen, setIsAddTableDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Queries
   const { data: menuItems = [], isLoading: menuLoading } = useQuery<MenuItemWithCategory[]>({
     queryKey: ["/api/menu"],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-      }
-    },
   });
 
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<MenuCategory[]>({
     queryKey: ["/api/categories"],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-      }
-    },
   });
 
   const { data: tables = [], isLoading: tablesLoading } = useQuery<Table[]>({
     queryKey: ["/api/admin/tables"],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-      }
-    },
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery<AnalyticsData>({
     queryKey: ["/api/admin/analytics"],
     enabled: activeSection === "analytics",
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-      }
-    },
   });
 
   // Mutations
@@ -75,16 +56,13 @@ export default function AdminPanel({}: AdminPanelProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/menu"] });
       setIsAddItemDialogOpen(false);
+      setSelectedFile(null);
       toast({
         title: "Menu Item Created",
         description: "The menu item has been created successfully.",
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-        return;
-      }
       toast({
         title: "Creation Failed",
         description: "Failed to create menu item. Please try again.",
@@ -100,16 +78,13 @@ export default function AdminPanel({}: AdminPanelProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/menu"] });
       setEditingItem(null);
+      setSelectedFile(null);
       toast({
         title: "Menu Item Updated",
         description: "The menu item has been updated successfully.",
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-        return;
-      }
       toast({
         title: "Update Failed",
         description: "Failed to update menu item. Please try again.",
@@ -130,10 +105,6 @@ export default function AdminPanel({}: AdminPanelProps) {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-        return;
-      }
       toast({
         title: "Deletion Failed",
         description: "Failed to delete menu item. Please try again.",
@@ -155,10 +126,6 @@ export default function AdminPanel({}: AdminPanelProps) {
       });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        handleUnauthorized();
-        return;
-      }
       toast({
         title: "Creation Failed",
         description: "Failed to create table. Please try again.",
@@ -167,30 +134,50 @@ export default function AdminPanel({}: AdminPanelProps) {
     },
   });
 
-  const handleUnauthorized = () => {
-    toast({
-      title: "Unauthorized",
-      description: "You are logged out. Logging in again...",
-      variant: "destructive",
-    });
-    setTimeout(() => {
-      window.location.href = "/api/login";
-    }, 500);
-  };
-
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
-  };
-
-  const handleMenuItemSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleMenuItemSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    let imageUrl = formData.get("imageUrl") as string;
+    
+    // If there's a selected file, upload it first
+    if (selectedFile) {
+      try {
+        setUploading(true);
+        const uploadFormData = new FormData();
+        uploadFormData.append('image', selectedFile);
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Upload failed');
+        }
+        
+        const result = await response.json();
+        imageUrl = result.imageUrl;
+      } catch (error) {
+        toast({
+          title: "Upload Failed",
+          description: error instanceof Error ? error.message : "Failed to upload image",
+          variant: "destructive",
+        });
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+    
     const data = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       price: formData.get("price") as string,
       categoryId: formData.get("categoryId") as string,
-      imageUrl: formData.get("imageUrl") as string,
+      imageUrl: imageUrl,
       preparationTime: parseInt(formData.get("preparationTime") as string) || undefined,
       isAvailable: formData.get("isAvailable") === "on",
     };
@@ -200,6 +187,9 @@ export default function AdminPanel({}: AdminPanelProps) {
     } else {
       createMenuItemMutation.mutate(data);
     }
+    
+    // Reset file selection
+    setSelectedFile(null);
   };
 
   const handleTableSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -221,7 +211,13 @@ export default function AdminPanel({}: AdminPanelProps) {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="font-cinzel text-2xl font-bold text-gold">Menu Items</CardTitle>
-          <Dialog open={isAddItemDialogOpen} onOpenChange={setIsAddItemDialogOpen}>
+          <Dialog open={isAddItemDialogOpen} onOpenChange={(open) => {
+            setIsAddItemDialogOpen(open);
+            if (open) {
+              setSelectedFile(null);
+              setEditingItem(null);
+            }
+          }}>
             <DialogTrigger asChild>
               <Button className="gold-gradient text-navy" data-testid="button-add-menu-item">
                 <i className="fas fa-plus mr-2"></i>Add New Item
@@ -260,8 +256,24 @@ export default function AdminPanel({}: AdminPanelProps) {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="imageUrl" className="text-warm-white">Image URL</Label>
-                  <Input id="imageUrl" name="imageUrl" className="bg-navy border-gold text-warm-white" />
+                  <Label htmlFor="image" className="text-warm-white">Menu Item Image</Label>
+                  <Input 
+                    id="image" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setSelectedFile(file || null);
+                    }}
+                    className="bg-navy border-gold text-warm-white file:bg-gold file:text-navy file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3" 
+                  />
+                  {selectedFile && (
+                    <p className="text-sm text-gold mt-1">Selected: {selectedFile.name}</p>
+                  )}
+                  <div className="mt-2">
+                    <Label className="text-warm-white text-sm">Or enter image URL:</Label>
+                    <Input name="imageUrl" placeholder="https://example.com/image.jpg" className="bg-navy border-gold text-warm-white" />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="preparationTime" className="text-warm-white">Preparation Time (minutes)</Label>
@@ -275,8 +287,8 @@ export default function AdminPanel({}: AdminPanelProps) {
                   <Button type="button" variant="outline" onClick={() => setIsAddItemDialogOpen(false)} className="flex-1 border-gold text-gold">
                     Cancel
                   </Button>
-                  <Button type="submit" className="flex-1 gold-gradient text-navy" data-testid="button-save-menu-item">
-                    Save Item
+                  <Button type="submit" disabled={uploading} className="flex-1 gold-gradient text-navy" data-testid="button-save-menu-item">
+                    {uploading ? "Uploading..." : "Save Item"}
                   </Button>
                 </div>
               </form>
@@ -528,14 +540,6 @@ export default function AdminPanel({}: AdminPanelProps) {
             </h1>
             <p className="text-xl text-warm-white">Restaurant Management & Analytics</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-gold text-gold hover:bg-gold hover:text-navy"
-            data-testid="button-logout"
-          >
-            <i className="fas fa-sign-out-alt mr-2"></i>Logout
-          </Button>
         </div>
         
         {/* Admin Navigation */}
@@ -626,13 +630,39 @@ export default function AdminPanel({}: AdminPanelProps) {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="edit-imageUrl" className="text-warm-white">Image URL</Label>
+                  <Label htmlFor="edit-image" className="text-warm-white">Menu Item Image</Label>
                   <Input 
-                    id="edit-imageUrl" 
-                    name="imageUrl" 
-                    defaultValue={editingItem.imageUrl || ''}
-                    className="bg-navy border-gold text-warm-white" 
+                    id="edit-image" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setSelectedFile(file || null);
+                    }}
+                    className="bg-navy border-gold text-warm-white file:bg-gold file:text-navy file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3" 
                   />
+                  {selectedFile && (
+                    <p className="text-sm text-gold mt-1">Selected: {selectedFile.name}</p>
+                  )}
+                  <div className="mt-2">
+                    <Label className="text-warm-white text-sm">Or enter image URL:</Label>
+                    <Input 
+                      name="imageUrl" 
+                      defaultValue={editingItem.imageUrl || ''}
+                      placeholder="https://example.com/image.jpg" 
+                      className="bg-navy border-gold text-warm-white" 
+                    />
+                  </div>
+                  {editingItem.imageUrl && (
+                    <div className="mt-2">
+                      <p className="text-sm text-warm-white">Current image:</p>
+                      <img 
+                        src={editingItem.imageUrl} 
+                        alt="Current menu item" 
+                        className="w-16 h-16 object-cover rounded border border-gold mt-1" 
+                      />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="edit-preparationTime" className="text-warm-white">Preparation Time (minutes)</Label>
@@ -664,10 +694,11 @@ export default function AdminPanel({}: AdminPanelProps) {
                   </Button>
                   <Button 
                     type="submit" 
+                    disabled={uploading}
                     className="flex-1 gold-gradient text-navy" 
                     data-testid="button-update-menu-item"
                   >
-                    Update Item
+                    {uploading ? "Uploading..." : "Update Item"}
                   </Button>
                 </div>
               </form>
