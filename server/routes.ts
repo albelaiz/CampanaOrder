@@ -83,8 +83,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Store in session (if using express-session)
-      if (req.session) {
-        req.session.tableNumber = parseInt(tableNumber);
+      if ((req as any).session) {
+        (req as any).session.tableNumber = parseInt(tableNumber);
       }
 
       res.json({ success: true, tableNumber: parseInt(tableNumber) });
@@ -100,8 +100,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderData = req.body;
       console.log('Received order data:', JSON.stringify(orderData, null, 2));
       
-      // Validate order data
-      const orderSchema = insertOrderSchema.extend({
+      // Validate order data - exclude orderNumber from validation since we generate it
+      const orderSchema = insertOrderSchema.omit({ orderNumber: true }).extend({
         items: z.array(insertOrderItemSchema),
         tableNumber: z.number().optional() // Allow table number in request body
       });
@@ -122,8 +122,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Fall back to session table number if available
-      if (!tableId && req.session && req.session.tableNumber) {
-        const table = await storage.getTableByNumber(req.session.tableNumber);
+      if (!tableId && (req as any).session && (req as any).session.tableNumber) {
+        const table = await storage.getTableByNumber((req as any).session.tableNumber);
         if (table) {
           tableId = table.id;
         }

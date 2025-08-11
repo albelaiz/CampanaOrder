@@ -21,7 +21,7 @@ import {
   type OrderWithItems,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -329,10 +329,11 @@ export class DatabaseStorage implements IStorage {
       .values(orderItemsWithOrderId)
       .returning();
 
+    const menuItemIds = items.map(item => item.menuItemId).filter(Boolean);
     const menuItemsData = await db
       .select()
       .from(menuItems)
-      .where(sql`${menuItems.id} = ANY(${items.map(item => item.menuItemId)})`);
+      .where(inArray(menuItems.id, menuItemIds));
 
     return {
       ...newOrder,
@@ -402,7 +403,7 @@ export class DatabaseStorage implements IStorage {
       .limit(5);
 
     return result.map(row => ({
-      item: row.menuItem,
+      item: row.menuItem!,
       count: Number(row.count)
     }));
   }
