@@ -102,13 +102,7 @@ export default function Footer() {
               Quick Order
             </h3>
             <div className="space-y-3">
-              <Button
-                onClick={simulateQRScan}
-                className="w-full gold-gradient text-navy py-3 rounded-lg font-medium hover:opacity-90 transition-opacity duration-300"
-                data-testid="button-scan-qr-footer"
-              >
-                <i className="fas fa-qrcode mr-2"></i>Scan Table QR
-              </Button>
+              
               <Button
                 onClick={scrollToMenu}
                 variant="outline"
