@@ -211,11 +211,13 @@ export class DatabaseStorage implements IStorage {
 
     const orderIds = ordersData.map(row => row.orders.id);
     
+    if (orderIds.length === 0) return [];
+    
     const orderItemsData = await db
       .select()
       .from(orderItems)
       .leftJoin(menuItems, eq(orderItems.menuItemId, menuItems.id))
-      .where(sql`${orderItems.orderId} = ANY(${orderIds})`);
+      .where(inArray(orderItems.orderId, orderIds));
 
     return ordersData.map(row => ({
       ...row.orders,
@@ -247,7 +249,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(orderItems)
       .leftJoin(menuItems, eq(orderItems.menuItemId, menuItems.id))
-      .where(sql`${orderItems.orderId} = ANY(${orderIds})`);
+      .where(inArray(orderItems.orderId, orderIds));
 
     return ordersData.map(row => ({
       ...row.orders,
@@ -329,7 +331,7 @@ export class DatabaseStorage implements IStorage {
       .values(orderItemsWithOrderId)
       .returning();
 
-    const menuItemIds = items.map(item => item.menuItemId).filter(Boolean);
+    const menuItemIds = items.map(item => item.menuItemId).filter(Boolean) as string[];
     const menuItemsData = await db
       .select()
       .from(menuItems)
